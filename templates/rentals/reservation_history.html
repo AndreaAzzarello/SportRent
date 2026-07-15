@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{# Storico cliente: filtra noleggi attivi, conclusi e cancellati. #}
+
+{% block title %}I miei noleggi - SportRent{% endblock %}
+
+{% block content %}
+<h2>I miei noleggi</h2>
+<p>
+    Controlla i noleggi ancora attivi, quelli conclusi e le prenotazioni
+    cancellate.
+</p>
+<p><a href="{% url 'equipment_list' %}">Cerca una nuova attrezzatura</a></p>
+
+<nav aria-label="Filtri noleggi">
+    <strong>Mostra:</strong>
+    <a href="?filter=active">Attivi ({{ conteggi.active }})</a>
+    | <a href="?filter=upcoming">In programma ({{ conteggi.upcoming }})</a>
+    | <a href="?filter=in_progress">In corso ({{ conteggi.in_progress }})</a>
+    | <a href="?filter=completed">Conclusi ({{ conteggi.completed }})</a>
+    | <a href="?filter=cancelled">Cancellati ({{ conteggi.cancelled }})</a>
+    | <a href="?filter=all">Tutti ({{ conteggi.all }})</a>
+</nav>
+
+<hr>
+
+{% if reservations %}
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">Noleggio</th>
+                <th scope="col">Periodo</th>
+                <th scope="col">Durata</th>
+                <th scope="col">Situazione</th>
+                <th scope="col">Totale</th>
+                <th scope="col">Azione</th>
+            </tr>
+        </thead>
+        <tbody>
+            {# Il ciclo mostra una riga per ogni prenotazione del cliente collegato. #}
+            {% for reservation in reservations %}
+                <tr>
+                    <td>
+                        <strong>#{{ reservation.pk }}</strong><br>
+                        Creato il {{ reservation.created_at|date:"d/m/Y" }}
+                    </td>
+                    <td>
+                        {{ reservation.start_date|date:"d/m/Y" }} -
+                        {{ reservation.end_date|date:"d/m/Y" }}
+                    </td>
+                    <td>{{ reservation.giorni_noleggio }} giorni</td>
+                    <td><strong>{{ reservation.etichetta_fase_noleggio }}</strong></td>
+                    <td>{{ reservation.prezzo_totale }} euro</td>
+                    <td>
+                        <a href="{% url 'reservation_detail' reservation.pk %}">
+                            Apri il riepilogo
+                        </a>
+                        {% if reservation.puo_essere_cancellata %}
+                            <br>Ancora cancellabile
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <h3>Nessun noleggio in questa sezione</h3>
+    {% if filtro_scelto == "active" %}
+        <p>Non hai noleggi futuri o attualmente in corso.</p>
+        <p><a href="{% url 'equipment_list' %}">Cerca un'attrezzatura</a></p>
+    {% else %}
+        <p>Scegli un altro filtro per consultare lo storico completo.</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

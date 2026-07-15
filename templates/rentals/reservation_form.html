@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{# Form di prenotazione: conferma il periodo già scelto e le quantità. #}
+
+{% block title %}Nuovo noleggio - SportRent{% endblock %}
+
+{% block content %}
+<p>
+    <a href="{% url 'equipment_list' %}{% if form.categoria_scelta %}?category={{ form.categoria_scelta.pk }}{% endif %}">
+        Torna al catalogo
+    </a>
+</p>
+<h2>Conferma il tuo noleggio</h2>
+<p>
+    In questa pagina non devi reinserire le date se arrivi dal catalogo: il
+    periodo è già stato scelto e viene ricontrollato dal sistema al momento
+    della conferma.
+</p>
+
+<form method="post">
+    {# Il token protegge la creazione della prenotazione da richieste esterne. #}
+    {% csrf_token %}
+    {{ form.category }}
+    {% if form.id_attrezzatura_scelta %}
+        <input type="hidden" name="attrezzatura_scelta" value="{{ form.id_attrezzatura_scelta }}">
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <section aria-label="Errori nella prenotazione">
+            <h3>Controlla i dati inseriti</h3>
+            {{ form.non_field_errors }}
+        </section>
+    {% endif %}
+
+    <fieldset>
+        <legend>1. Periodo di noleggio</legend>
+        {% if form.periodo_valido %}
+            {{ form.start_date.as_hidden }}
+            {{ form.end_date.as_hidden }}
+            <p>
+                Periodo scelto:
+                <strong>{{ form.inizio_periodo|date:"d/m/Y" }}</strong> -
+                <strong>{{ form.fine_periodo|date:"d/m/Y" }}</strong>.
+            </p>
+            <p>
+                Per cambiare date torna al catalogo della categoria e ripeti
+                la ricerca.
+            </p>
+        {% else %}
+            <p>
+                Indica un periodo valido per vedere le attrezzature prenotabili.
+                Le date nel passato non possono essere usate.
+            </p>
+            <p>
+                {{ form.start_date.label_tag }}
+                {{ form.start_date }}
+                {{ form.start_date.errors }}
+            </p>
+            <p>
+                {{ form.end_date.label_tag }}
+                {{ form.end_date }}
+                {{ form.end_date.errors }}
+            </p>
+        {% endif %}
+    </fieldset>
+
+    <fieldset>
+        <legend>2. Attrezzature disponibili</legend>
+        {% if form.categoria_scelta %}
+            <p>
+                Categoria: <strong>{{ form.categoria_scelta.name }}</strong>.
+                La tabella mostra l'articolo scelto e le altre attrezzature
+                disponibili della stessa categoria nel periodo indicato.
+            </p>
+        {% endif %}
+
+        {% if form.campi_attrezzature %}
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Articolo</th>
+                        <th scope="col">Indicazione</th>
+                        <th scope="col">Prezzo giornaliero</th>
+                        <th scope="col">Unità disponibili</th>
+                        <th scope="col">Quantità da noleggiare</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {# Ogni riga corrisponde a un articolo prenotabile nella categoria selezionata. #}
+                    {% for riga in form.righe_attrezzature %}
+                        <tr>
+                            <td>{{ riga.equipment.name }}</td>
+                            <td>
+                                {% if riga.is_selected %}
+                                    <strong>Articolo scelto dal catalogo</strong>
+                                {% else %}
+                                    Disponibile come aggiunta
+                                {% endif %}
+                            </td>
+                            <td>{{ riga.equipment.daily_price }} euro</td>
+                            <td>{{ riga.available }} unità</td>
+                            <td>
+                                {{ riga.field }}
+                                {{ riga.field.errors }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p>Lascia a zero gli articoli che non vuoi aggiungere al noleggio.</p>
+        {% elif form.periodo_valido %}
+            <p>
+                Non ci sono attrezzature disponibili per questa categoria nel
+                periodo indicato.
+            </p>
+        {% else %}
+            <p>
+                La lista comparirà solo dopo l'inserimento di un periodo valido.
+            </p>
+        {% endif %}
+    </fieldset>
+
+    <fieldset>
+        <legend>3. Conferma</legend>
+        <ul>
+            <li>Il prezzo finale sarà mostrato nel dettaglio del noleggio.</li>
+            <li>Il pagamento avverrà al momento del ritiro.</li>
+        </ul>
+        <button type="submit">Conferma il noleggio</button>
+    </fieldset>
+</form>
+{% endblock %}

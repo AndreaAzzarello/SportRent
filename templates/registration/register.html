@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{# Pagina di registrazione pubblica: crea un nuovo account cliente. #}
+
+{% block title %}Registrazione - SportRent{% endblock %}
+
+{% block content %}
+<h2>Crea il tuo account SportRent</h2>
+<p>
+    Registrati per prenotare attrezzature e consultare lo storico dei
+    tuoi noleggi. Tutti i campi sono obbligatori.
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+    {{ form.non_field_errors }}
+    <fieldset>
+        <legend>Dati personali</legend>
+        <p>
+            {{ form.first_name.label_tag }}
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+        </p>
+        <p>
+            {{ form.last_name.label_tag }}
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+        </p>
+        <p>
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {{ form.email.errors }}
+        </p>
+    </fieldset>
+    <fieldset>
+        <legend>Credenziali di accesso</legend>
+        <p>
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {{ form.username.help_text }}
+            {{ form.username.errors }}
+        </p>
+        <p>
+            {{ form.password1.label_tag }}
+            {{ form.password1 }}
+            {{ form.password1.help_text }}
+            {{ form.password1.errors }}
+        </p>
+        <p>
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            {{ form.password2.help_text }}
+            {{ form.password2.errors }}
+        </p>
+    </fieldset>
+    <p>
+        Creando l'account verrai autenticato automaticamente e potrai
+        iniziare subito una prenotazione.
+    </p>
+    <button type="submit">Registrati</button>
+</form>
+
+<p>Hai già un account? <a href="{% url 'login' %}">Accedi</a>.</p>
+{% endblock %}

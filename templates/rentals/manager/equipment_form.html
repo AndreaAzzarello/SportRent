@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{# Form gestore per creare o aggiornare un'attrezzatura. #}
+
+{% block title %}{{ page_title }} - SportRent{% endblock %}
+
+{% block content %}
+<h2>{{ page_title }}</h2>
+<p>Compila la scheda che verrà mostrata nel catalogo pubblico.</p>
+{% include "rentals/manager/_navigation.html" %}
+
+{# multipart/form-data è necessario per inviare anche il file immagine. #}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <fieldset>
+        <legend>Informazioni prodotto</legend>
+        <p>
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {{ form.name.errors }}
+        </p>
+        <p>
+            {{ form.category.label_tag }}
+            {{ form.category }}
+            {{ form.category.errors }}
+        </p>
+        <p>
+            {{ form.description.label_tag }}
+            {{ form.description }}
+            {{ form.description.errors }}
+        </p>
+        <p>
+            {{ form.image.label_tag }}
+            {{ form.image }}
+            {{ form.image.errors }}
+        </p>
+    </fieldset>
+    <fieldset>
+        <legend>Disponibilità e prezzo</legend>
+        <p>
+            {{ form.total_quantity.label_tag }}
+            {{ form.total_quantity }}
+            {{ form.total_quantity.errors }}
+        </p>
+        <p>
+            {{ form.daily_price.label_tag }}
+            {{ form.daily_price }}
+            {{ form.daily_price.errors }}
+        </p>
+        <p>
+            {{ form.is_active }}
+            {{ form.is_active.label_tag }}
+            {{ form.is_active.errors }}
+        </p>
+        <p>
+            Disattiva la pubblicazione per nascondere temporaneamente
+            l'articolo dal catalogo senza eliminarlo.
+        </p>
+    </fieldset>
+    <button type="submit">Salva attrezzatura</button>
+</form>
+
+<p><a href="{% url 'manager_equipment_list' %}">Annulla e torna al catalogo</a></p>
+{% endblock %}

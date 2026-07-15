@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{# Elenco categorie sportive gestite dal pannello operativo. #}
+
+{% block title %}Gestione categorie - SportRent{% endblock %}
+
+{% block content %}
+<h2>Categorie sportive</h2>
+<p>Organizza le attrezzature nelle categorie mostrate ai clienti.</p>
+{% include "rentals/manager/_navigation.html" %}
+
+<p><a href="{% url 'manager_category_create' %}">Crea una nuova categoria</a></p>
+
+<table>
+    <thead>
+        <tr>
+            <th scope="col">Categoria</th>
+            <th scope="col">Descrizione</th>
+            <th scope="col">Azioni</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for category in categorie %}
+            <tr>
+                <td><strong>{{ category.name }}</strong></td>
+                <td>{{ category.description|default:"Nessuna descrizione" }}</td>
+                <td>
+                    <a href="{% url 'manager_category_update' category.pk %}">
+                        Modifica
+                    </a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="3">Nessuna categoria inserita.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{# Scheda pubblica di un'attrezzatura con disponibilità e avvio prenotazione. #}
+
+{% block title %}{{ equipment.name }} - SportRent{% endblock %}
+
+{% block content %}
+<article>
+    <p>
+        <a href="{% url 'equipment_list' %}?category={{ equipment.category.pk }}{% if periodo_scelto %}&amp;start_date={{ periodo_scelto.start_date|date:'Y-m-d' }}&amp;end_date={{ periodo_scelto.end_date|date:'Y-m-d' }}{% endif %}">
+            Torna alla categoria {{ equipment.category.name }}
+        </a>
+    </p>
+    <h2>{{ equipment.name }}</h2>
+    <p><strong>{{ equipment.category.name }}</strong></p>
+
+    {% if equipment.image %}
+        <img
+            src="{{ equipment.image.url }}"
+            alt="{{ equipment.name }}"
+            width="500"
+        >
+    {% else %}
+        <p><em>Immagine non ancora disponibile.</em></p>
+    {% endif %}
+
+    <h3>Descrizione</h3>
+    <p>{{ equipment.description|linebreaksbr }}</p>
+
+    <h3>Informazioni sul noleggio</h3>
+    <dl>
+        <dt>Prezzo giornaliero</dt>
+        <dd><strong>{{ equipment.daily_price }} euro</strong></dd>
+        {% if periodo_scelto %}
+            <dt>Periodo richiesto</dt>
+            <dd>
+                {{ periodo_scelto.start_date|date:"d/m/Y" }} -
+                {{ periodo_scelto.end_date|date:"d/m/Y" }}
+            </dd>
+            <dt>Disponibili nel periodo</dt>
+            <dd><strong>{{ disponibili_periodo }} unità</strong></dd>
+        {% else %}
+            <dt>Disponibili oggi</dt>
+            <dd>{{ available_today }} su {{ equipment.total_quantity }} unità</dd>
+        {% endif %}
+        <dt>Pagamento</dt>
+        <dd>Al ritiro dell'attrezzatura</dd>
+    </dl>
+
+    {% if not periodo_scelto %}
+        <p>
+            Per prenotare questa attrezzatura scegli prima il periodo di
+            noleggio della categoria.
+        </p>
+        <p>
+            <a href="{% url 'equipment_list' %}?category={{ equipment.category.pk }}">
+                Scegli le date per {{ equipment.category.name }}
+            </a>
+        </p>
+    {% elif disponibili_periodo == 0 %}
+        <p>
+            <strong>Articolo non disponibile nel periodo selezionato.</strong>
+        </p>
+        <p>
+            <a href="{% url 'equipment_list' %}?category={{ equipment.category.pk }}">
+                Cerca altre date
+            </a>
+        </p>
+    {% elif user.is_authenticated %}
+        <p>
+            <a href="{% url 'reservation_create' %}?equipment={{ equipment.pk }}&amp;category={{ equipment.category.pk }}&amp;start_date={{ periodo_scelto.start_date|date:'Y-m-d' }}&amp;end_date={{ periodo_scelto.end_date|date:'Y-m-d' }}">
+                Continua con la prenotazione
+            </a>
+        </p>
+    {% else %}
+        <h3>Accedi per prenotare</h3>
+        <p>
+            <a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">
+                Accedi al tuo account
+            </a>.
+        </p>
+        <p>
+            <a href="{% url 'register' %}?next={{ request.get_full_path|urlencode }}">
+                Crea un account gratuito
+            </a>
+            per effettuare la tua prima prenotazione.
+        </p>
+        <p>Dopo l'accesso tornerai a questa attrezzatura.</p>
+    {% endif %}
+</article>
+{% endblock %}

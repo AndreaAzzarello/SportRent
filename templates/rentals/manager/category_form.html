@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{# Form gestore per creare o modificare una categoria sportiva. #}
+
+{% block title %}{{ page_title }} - SportRent{% endblock %}
+
+{% block content %}
+<h2>{{ page_title }}</h2>
+<p>
+    La categoria aiuta i clienti a trovare rapidamente l'attrezzatura.
+</p>
+{% include "rentals/manager/_navigation.html" %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <fieldset>
+        <legend>Dati categoria</legend>
+        <p>
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {{ form.name.errors }}
+        </p>
+        <p>
+            {{ form.description.label_tag }}
+            {{ form.description }}
+            {{ form.description.errors }}
+        </p>
+    </fieldset>
+    <button type="submit">Salva categoria</button>
+</form>
+
+<p><a href="{% url 'manager_category_list' %}">Annulla e torna alle categorie</a></p>
+{% endblock %}

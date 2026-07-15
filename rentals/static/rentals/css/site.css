@@ -1,0 +1,271 @@
+/* Stile base per SportRent: semplice, chiaro e senza JavaScript. */
+:root {
+    --sfondo: #f4f7fb;
+    --pannello: #ffffff;
+    --testo: #1f2933;
+    --muted: #5c6b7a;
+    --primario: #1f6f8b;
+    --primario-scuro: #15506a;
+    --bordo: #d8e2ec;
+    --evidenza: #eef7fb;
+    --successo: #eaf7ef;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--sfondo);
+    color: var(--testo);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.55;
+}
+
+header,
+main,
+footer {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+header {
+    margin-top: 24px;
+    padding: 24px;
+    background: var(--pannello);
+    border: 1px solid var(--bordo);
+    border-radius: 14px;
+}
+
+main {
+    margin-top: 18px;
+    padding: 24px;
+    background: var(--pannello);
+    border: 1px solid var(--bordo);
+    border-radius: 14px;
+}
+
+footer {
+    margin-top: 18px;
+    margin-bottom: 28px;
+    padding: 18px 24px;
+    color: var(--muted);
+}
+
+h1,
+h2,
+h3 {
+    color: var(--primario-scuro);
+    line-height: 1.25;
+}
+
+h1 {
+    margin: 0 0 4px;
+    font-size: 2rem;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+h1 a {
+    color: var(--primario-scuro);
+    text-decoration: none;
+}
+
+a {
+    color: var(--primario);
+    font-weight: 600;
+}
+
+a:hover {
+    color: var(--primario-scuro);
+}
+
+nav {
+    margin-top: 14px;
+}
+
+nav a,
+main a {
+    display: inline-block;
+    margin: 2px 0;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--bordo);
+    margin: 22px 0;
+}
+
+section,
+article,
+fieldset {
+    margin-bottom: 20px;
+}
+
+article,
+fieldset,
+section[aria-label="Messaggi"] {
+    padding: 18px;
+    background: #fbfdff;
+    border: 1px solid var(--bordo);
+    border-radius: 12px;
+}
+
+section[aria-label="Messaggi"] {
+    width: min(1120px, calc(100% - 32px));
+    margin: 18px auto 0;
+    background: var(--successo);
+}
+
+legend {
+    padding: 0 8px;
+    font-weight: 700;
+    color: var(--primario-scuro);
+}
+
+label {
+    display: inline-block;
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+
+input,
+select,
+textarea {
+    width: min(100%, 420px);
+    padding: 9px 10px;
+    border: 1px solid #b8c6d4;
+    border-radius: 8px;
+    background: #ffffff;
+    font: inherit;
+}
+
+input[type="checkbox"] {
+    width: auto;
+}
+
+button,
+input[type="submit"] {
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--primario);
+    color: #ffffff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+button:hover,
+input[type="submit"]:hover {
+    background: var(--primario-scuro);
+}
+
+table {
+    width: 100%;
+    margin: 14px 0 18px;
+    border-collapse: collapse;
+    background: #ffffff;
+}
+
+th,
+td {
+    padding: 11px 12px;
+    border: 1px solid var(--bordo);
+    vertical-align: top;
+}
+
+th {
+    background: var(--evidenza);
+    color: var(--primario-scuro);
+    text-align: left;
+}
+
+tr:nth-child(even) td {
+    background: #fafcff;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid var(--bordo);
+    background: #ffffff;
+}
+
+dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 14px;
+}
+
+dt {
+    font-weight: 700;
+    color: var(--primario-scuro);
+}
+
+dd {
+    margin: 0;
+}
+
+ul,
+ol {
+    padding-left: 24px;
+}
+
+details {
+    padding: 12px 14px;
+    background: #fbfdff;
+    border: 1px solid var(--bordo);
+    border-radius: 10px;
+}
+
+@media (max-width: 720px) {
+    header,
+    main,
+    footer,
+    section[aria-label="Messaggi"] {
+        width: min(100% - 18px, 1120px);
+    }
+
+    header,
+    main {
+        padding: 16px;
+    }
+
+    table,
+    thead,
+    tbody,
+    tr,
+    th,
+    td {
+        display: block;
+    }
+
+    th {
+        display: none;
+    }
+
+    td {
+        border-top: 0;
+    }
+
+    tr {
+        margin-bottom: 12px;
+        border: 1px solid var(--bordo);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    dl {
+        display: block;
+    }
+
+    dt {
+        margin-top: 8px;
+    }
+}

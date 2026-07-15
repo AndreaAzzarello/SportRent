@@ -1,0 +1,23 @@
+# Ambiente virtuale e cache Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# File locali e temporanei
+.env
+*.log
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Editor e sistema operativo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# SQLite temporanei
+*.sqlite3-journal

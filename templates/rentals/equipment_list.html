@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{# Home/catalogo pubblico: prima categoria, poi date, poi risultati disponibili. #}
+
+{% block title %}Noleggio attrezzature sportive - SportRent{% endblock %}
+
+{% block content %}
+<section aria-labelledby="home-title">
+    <h2 id="home-title">Trova l'attrezzatura sportiva da noleggiare</h2>
+    <p>
+        Il percorso parte dalla categoria sportiva: scegli che tipo di
+        attrezzatura ti serve, poi indica il periodo e il sito mostra solo gli
+        articoli disponibili per quei giorni.
+    </p>
+</section>
+
+{% if not categoria_scelta %}
+    <section aria-labelledby="category-choice">
+        <h2 id="category-choice">1. Scegli la categoria</h2>
+        <p>
+            Inizia dalla disciplina o dal tipo di attrezzatura che vuoi
+            noleggiare. Le date verranno richieste nel passaggio successivo.
+        </p>
+        {% if modulo_ricerca.is_bound and modulo_ricerca.errors %}
+            <section aria-label="Errori ricerca">
+                <h3>Controlla la scelta</h3>
+                {{ modulo_ricerca.non_field_errors }}
+                {{ modulo_ricerca.category.errors }}
+            </section>
+        {% endif %}
+        <ul>
+            {% for category in categorie %}
+                <li>
+                    <a href="?category={{ category.pk }}">
+                        <strong>{{ category.name }}</strong>
+                    </a>
+                    {% if category.description %}
+                        - {{ category.description }}
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li>Nessuna categoria disponibile.</li>
+            {% endfor %}
+        </ul>
+    </section>
+{% else %}
+    <section aria-labelledby="period-choice">
+        <h2 id="period-choice">2. Indica le date</h2>
+        <p>
+            Categoria scelta: <strong>{{ categoria_scelta.name }}</strong>.
+            Inserisci ritiro e riconsegna per vedere soltanto le attrezzature
+            disponibili in quelle date.
+        </p>
+        <p><a href="{% url 'equipment_list' %}">Cambia categoria</a></p>
+
+        <form method="get">
+            {# Il form usa GET per conservare categoria e date nella URL. #}
+            {{ modulo_ricerca.non_field_errors }}
+            <input type="hidden" name="category" value="{{ categoria_scelta.pk }}">
+
+            <fieldset>
+                <legend>2. Periodo di noleggio</legend>
+                <p>
+                    {{ modulo_ricerca.start_date.label_tag }}
+                    {{ modulo_ricerca.start_date }}
+                    {{ modulo_ricerca.start_date.errors }}
+                </p>
+                <p>
+                    {{ modulo_ricerca.end_date.label_tag }}
+                    {{ modulo_ricerca.end_date }}
+                    {{ modulo_ricerca.end_date.errors }}
+                </p>
+                <button type="submit">Mostra disponibilità</button>
+            </fieldset>
+        </form>
+    </section>
+{% endif %}
+
+<hr>
+
+<section aria-labelledby="catalog-results">
+    {% if categoria_scelta and periodo_scelto %}
+        <h2 id="catalog-results">Attrezzature disponibili</h2>
+        <p>
+            Categoria <strong>{{ categoria_scelta.name }}</strong>, dal
+            <strong>{{ periodo_scelto.start_date|date:"d/m/Y" }}</strong>
+            al <strong>{{ periodo_scelto.end_date|date:"d/m/Y" }}</strong>.
+            Risultati trovati: {{ pagina.paginator.count }}.
+        </p>
+
+        {% if equipment_list %}
+            {# Ogni risultato conserva categoria e date nel collegamento. #}
+            {% for equipment in equipment_list %}
+                <article>
+                    <h3>
+                        <a href="{% url 'equipment_detail' equipment.pk %}?category={{ categoria_scelta.pk }}&amp;start_date={{ periodo_scelto.start_date|date:'Y-m-d' }}&amp;end_date={{ periodo_scelto.end_date|date:'Y-m-d' }}">
+                            {{ equipment.name }}
+                        </a>
+                    </h3>
+
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    {% if equipment.image %}
+                                        <img
+                                            src="{{ equipment.image.url }}"
+                                            alt="{{ equipment.name }}"
+                                            width="260"
+                                        >
+                                    {% else %}
+                                        <em>Immagine non ancora disponibile</em>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <p>{{ equipment.description|truncatewords:30 }}</p>
+                                    <dl>
+                                        <dt>Categoria</dt>
+                                        <dd>{{ equipment.category.name }}</dd>
+                                        <dt>Prezzo giornaliero</dt>
+                                        <dd><strong>{{ equipment.daily_price }} euro</strong></dd>
+                                        <dt>Disponibili nel periodo</dt>
+                                        <dd><strong>{{ equipment.disponibili_periodo }} unità</strong></dd>
+                                    </dl>
+                                    <p>
+                                        <a href="{% url 'equipment_detail' equipment.pk %}?category={{ categoria_scelta.pk }}&amp;start_date={{ periodo_scelto.start_date|date:'Y-m-d' }}&amp;end_date={{ periodo_scelto.end_date|date:'Y-m-d' }}">
+                                            Apri scheda e prenota
+                                        </a>
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </article>
+                {% if not forloop.last %}<hr>{% endif %}
+            {% endfor %}
+
+            {% if pagina.has_other_pages %}
+                <nav aria-label="Pagine catalogo">
+                    <p>Pagina {{ pagina.number }} di {{ pagina.paginator.num_pages }}</p>
+                    {% if pagina.has_previous %}
+                        <a href="?{% if query_paginazione %}{{ query_paginazione }}&amp;{% endif %}page={{ pagina.previous_page_number }}">Pagina precedente</a>
+                    {% endif %}
+                    {% if pagina.has_next %}
+                        {% if pagina.has_previous %} | {% endif %}
+                        <a href="?{% if query_paginazione %}{{ query_paginazione }}&amp;{% endif %}page={{ pagina.next_page_number }}">Pagina successiva</a>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        {% else %}
+            <h3>Nessun'attrezzatura disponibile</h3>
+            <p>
+                Per questa categoria non ci sono articoli liberi nel periodo
+                scelto. Prova date diverse oppure cambia categoria.
+            </p>
+        {% endif %}
+    {% elif categoria_scelta and modulo_ricerca.is_bound and modulo_ricerca.errors %}
+        <h2 id="catalog-results">Periodo non valido</h2>
+        <p>
+            Correggi le date indicate. Se la data di ritiro è nel passato,
+            il sito non mostra attrezzature perché il noleggio non sarebbe
+            possibile.
+        </p>
+    {% elif categoria_scelta %}
+        <p>
+            Dopo aver scelto il periodo, qui compariranno gli articoli
+            disponibili.
+        </p>
+    {% endif %}
+</section>
+{% endblock %}
