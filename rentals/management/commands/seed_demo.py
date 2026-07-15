@@ -77,6 +77,7 @@ class Command(BaseCommand):
                 ),
                 "total_quantity": 18,
                 "daily_price": "9.50",
+                "image": "equipment/scarponi-sci.png",
             },
             {
                 "name": "Mountain bike",
@@ -136,6 +137,7 @@ class Command(BaseCommand):
                 ),
                 "total_quantity": 10,
                 "daily_price": "20.00",
+                "image": "equipment/stand-up-paddle.png",
             },
             {
                 "name": "Kit pesi regolabili",
@@ -145,6 +147,7 @@ class Command(BaseCommand):
                 ),
                 "total_quantity": 7,
                 "daily_price": "12.00",
+                "image": "equipment/kit-pesi-regolabili.png",
             },
             {
                 "name": "Palla medica",
@@ -155,6 +158,7 @@ class Command(BaseCommand):
                 ),
                 "total_quantity": 2,
                 "daily_price": "5.00",
+                "image": "equipment/palla-medica.png",
             },
             {
                 "name": "Panca fitness regolabile",

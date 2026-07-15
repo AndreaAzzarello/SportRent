@@ -1,39 +1,57 @@
 {% extends "base.html" %}
-{# Elenco categorie sportive gestite dal pannello operativo. #}
 
 {% block title %}Gestione categorie - SportRent{% endblock %}
 
 {% block content %}
-<h2>Categorie sportive</h2>
-<p>Organizza le attrezzature nelle categorie mostrate ai clienti.</p>
+<section class="page-hero page-hero--manager" aria-labelledby="category-title">
+    <div>
+        <p class="eyebrow">Catalogo gestore</p>
+        <h1 id="category-title">Categorie sportive</h1>
+        <p>Organizza le attrezzature nelle categorie mostrate ai clienti.</p>
+    </div>
+    <a class="button" href="{% url 'manager_category_create' %}">Crea una nuova categoria</a>
+</section>
+
 {% include "rentals/manager/_navigation.html" %}
 
-<p><a href="{% url 'manager_category_create' %}">Crea una nuova categoria</a></p>
-
-<table>
-    <thead>
-        <tr>
-            <th scope="col">Categoria</th>
-            <th scope="col">Descrizione</th>
-            <th scope="col">Azioni</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for category in categorie %}
-            <tr>
-                <td><strong>{{ category.name }}</strong></td>
-                <td>{{ category.description|default:"Nessuna descrizione" }}</td>
-                <td>
-                    <a href="{% url 'manager_category_update' category.pk %}">
-                        Modifica
-                    </a>
-                </td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="3">Nessuna categoria inserita.</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<section class="section-card">
+    <div class="toolbar">
+        <div>
+            <p class="eyebrow">Categorie</p>
+            <h2>Elenco categorie</h2>
+        </div>
+        <label class="table-search">
+            Cerca categoria
+            <input type="search" data-table-search="manager-category-table" placeholder="Nome o descrizione...">
+        </label>
+    </div>
+    <div class="table-wrap">
+        <table class="manager-table" id="manager-category-table" data-searchable-table>
+            <thead>
+                <tr>
+                    <th scope="col">Categoria</th>
+                    <th scope="col">Descrizione</th>
+                    <th scope="col">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categorie %}
+                    <tr>
+                        <td><strong>{{ category.name }}</strong></td>
+                        <td>{{ category.description|default:"Nessuna descrizione" }}</td>
+                        <td>
+                            <a class="button button--light" href="{% url 'manager_category_update' category.pk %}">
+                                Modifica
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3">Nessuna categoria inserita.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
 {% endblock %}

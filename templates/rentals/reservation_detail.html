@@ -1,92 +1,159 @@
 {% extends "base.html" %}
-{# Riepilogo di una prenotazione: articoli, totale, stato e cancellazione. #}
 
 {% block title %}Riepilogo noleggio - SportRent{% endblock %}
 
 {% block content %}
 {% if user.is_staff or user.is_superuser %}
-    <p><a href="{% url 'manager_reservation_list' %}">Torna alle prenotazioni</a></p>
+    <p><a class="link-muted" href="{% url 'manager_reservation_list' %}">Torna alle prenotazioni</a></p>
 {% else %}
-    <p><a href="{% url 'reservation_history' %}">Torna ai miei noleggi</a></p>
+    <p><a class="link-muted" href="{% url 'reservation_history' %}">Torna ai miei noleggi</a></p>
 {% endif %}
 
-<h2>Riepilogo noleggio</h2>
-<p>
-    Situazione:
-    <strong>{{ reservation.etichetta_fase_noleggio }}</strong>
-</p>
-
-<section aria-labelledby="rental-data">
-    <h3 id="rental-data">Dati del noleggio</h3>
-    <dl>
-        <dt>Cliente</dt>
-        <dd>
-            {{ reservation.user.get_full_name|default:reservation.user.username }}
-        </dd>
-        <dt>Periodo</dt>
-        <dd>
-            Dal {{ reservation.start_date|date:"d/m/Y" }}
-            al {{ reservation.end_date|date:"d/m/Y" }}
-        </dd>
-        <dt>Durata</dt>
-        <dd>{{ reservation.giorni_noleggio }} giorni</dd>
-        <dt>Data di prenotazione</dt>
-        <dd>{{ reservation.created_at|date:"d/m/Y H:i" }}</dd>
-        {% if reservation.cancelled_at %}
-            <dt>Data di cancellazione</dt>
-            <dd>{{ reservation.cancelled_at|date:"d/m/Y H:i" }}</dd>
-        {% endif %}
-    </dl>
+<section class="reservation-hero status-{{ reservation.fase_noleggio }}" aria-labelledby="reservation-title">
+    <div>
+        <p class="eyebrow">Dettaglio prenotazione</p>
+        <h1 id="reservation-title">Riepilogo noleggio</h1>
+        <p>
+            Qui trovi periodo, articoli prenotati, totale da pagare al ritiro
+            e stato aggiornato del noleggio.
+        </p>
+    </div>
+    <div class="reservation-hero__status">
+        <span class="status-badge status-badge--{{ reservation.fase_noleggio }}">
+            {{ reservation.etichetta_fase_noleggio }}
+        </span>
+        <strong>{{ reservation.prezzo_totale }} euro</strong>
+        <small>Totale noleggio</small>
+    </div>
 </section>
 
-<section aria-labelledby="rental-items">
-    <h3 id="rental-items">Attrezzature prenotate</h3>
-    <table>
-        <thead>
-            <tr>
-                <th scope="col">Attrezzatura</th>
-                <th scope="col">Categoria</th>
-                <th scope="col">Quantità</th>
-                <th scope="col">Prezzo al giorno</th>
-                <th scope="col">Subtotale</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in reservation.items.all %}
-                <tr>
-                    <td>{{ item.equipment.name }}</td>
-                    <td>{{ item.equipment.category.name }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.daily_price }} euro</td>
-                    <td>{{ item.subtotale }} euro</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="4" scope="riga">Totale del noleggio</th>
-                <td><strong>{{ reservation.prezzo_totale }} euro</strong></td>
-            </tr>
-        </tfoot>
-    </table>
-    <p>Pagamento previsto al ritiro dell'attrezzatura.</p>
+<section class="summary-grid" aria-label="Dati principali del noleggio">
+    <article class="summary-tile">
+        <span>Ritiro</span>
+        <strong>{{ reservation.start_date|date:"d/m/Y" }}</strong>
+    </article>
+    <article class="summary-tile">
+        <span>Riconsegna</span>
+        <strong>{{ reservation.end_date|date:"d/m/Y" }}</strong>
+    </article>
+    <article class="summary-tile">
+        <span>Durata</span>
+        <strong>{{ reservation.giorni_noleggio }} giorni</strong>
+    </article>
+    <article class="summary-tile">
+        <span>Pagamento</span>
+        <strong>Al ritiro</strong>
+    </article>
 </section>
+
+<div class="reservation-layout">
+    <section class="section-card reservation-main" aria-labelledby="rental-items">
+        <div class="section-heading section-heading--row">
+            <div>
+                <p class="eyebrow">Attrezzature</p>
+                <h2 id="rental-items">Cosa hai prenotato</h2>
+            </div>
+            <span class="result-count">{{ reservation.items.count }} articolo/i</span>
+        </div>
+
+        <div class="table-wrap">
+            <table class="rental-table reservation-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Articolo</th>
+                        <th scope="col">Quantità</th>
+                        <th scope="col">Prezzo al giorno</th>
+                        <th scope="col">Subtotale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in reservation.items.all %}
+                        <tr>
+                            <td>
+                                <div class="rental-item-cell">
+                                    {% if item.equipment.image %}
+                                        <img src="{{ item.equipment.image.url }}" alt="{{ item.equipment.name }}">
+                                    {% else %}
+                                        <span class="rental-item-cell__placeholder">SR</span>
+                                    {% endif %}
+                                    <span>
+                                        <strong>{{ item.equipment.name }}</strong>
+                                        <small>{{ item.equipment.category.name }}</small>
+                                    </span>
+                                </div>
+                            </td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.daily_price }} euro</td>
+                            <td><strong>{{ item.subtotale }} euro</strong></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3" scope="row">Totale del noleggio</th>
+                        <td><strong>{{ reservation.prezzo_totale }} euro</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+
+    <aside class="reservation-side" aria-label="Informazioni riepilogo">
+        <section class="side-card">
+            <p class="eyebrow">Dati noleggio</p>
+            <h2>Dettagli</h2>
+            <dl class="clean-list">
+                <dt>Cliente</dt>
+                <dd>{{ reservation.user.get_full_name|default:reservation.user.username }}</dd>
+                <dt>Creato il</dt>
+                <dd>{{ reservation.created_at|date:"d/m/Y H:i" }}</dd>
+                {% if reservation.cancelled_at %}
+                    <dt>Cancellato il</dt>
+                    <dd>{{ reservation.cancelled_at|date:"d/m/Y H:i" }}</dd>
+                {% endif %}
+                <dt>Stato</dt>
+                <dd>{{ reservation.etichetta_fase_noleggio }}</dd>
+            </dl>
+        </section>
+
+        <section class="side-card side-card--soft">
+            <p class="eyebrow">Promemoria</p>
+            {% if reservation.status == "cancelled" %}
+                <h2>Noleggio cancellato</h2>
+                <p>Questa prenotazione resta nello storico, ma le attrezzature sono tornate disponibili.</p>
+            {% elif reservation.fase_noleggio == "upcoming" %}
+                <h2>Prima del ritiro</h2>
+                <p>Presentati nel giorno indicato. Il pagamento è previsto al momento del ritiro dell'attrezzatura.</p>
+            {% elif reservation.fase_noleggio == "in_progress" %}
+                <h2>Noleggio in corso</h2>
+                <p>Ricorda la data di riconsegna indicata nel riepilogo per completare il noleggio correttamente.</p>
+            {% else %}
+                <h2>Noleggio concluso</h2>
+                <p>Il noleggio è terminato e rimane consultabile nello storico del tuo account.</p>
+            {% endif %}
+        </section>
+    </aside>
+</div>
 
 {% if reservation.puo_essere_cancellata and reservation.user == user %}
-    {# Solo il proprietario può cancellare una prenotazione ancora futura. #}
-    <hr>
-    <section aria-labelledby="cancella-rental">
-        <h3 id="cancella-rental">Devi cambiare programma?</h3>
-        <p>
-            Puoi cancellare questo noleggio per liberare immediatamente le
-            attrezzature prenotate. L'operazione non può essere annullata.
-        </p>
-        <form method="post" action="{% url 'reservation_cancel' reservation.pk %}">
+    <section class="section-card danger-panel" aria-labelledby="cancel-rental">
+        <div>
+            <p class="eyebrow">Gestione prenotazione</p>
+            <h2 id="cancel-rental">Devi cambiare programma?</h2>
+            <p>
+                Puoi cancellare il noleggio finché il ritiro non è iniziato.
+                Dopo la cancellazione le attrezzature tornano subito disponibili.
+            </p>
+        </div>
+        <form method="post" action="{% url 'reservation_cancel' reservation.pk %}" data-confirm="Vuoi davvero cancellare questo noleggio?">
             {% csrf_token %}
-            <button type="submit">Cancella il noleggio</button>
+            <button class="button button--danger" type="submit">Cancella il noleggio</button>
         </form>
     </section>
 {% elif reservation.status == "cancelled" %}
-    <p><strong>Questo noleggio è stato cancellato.</strong></p>
+    <section class="section-card empty-state empty-state--warning">
+        <h2>Questo noleggio è stato cancellato</h2>
+        <p>Lo trovi ancora nello storico, ma non occupa più disponibilità nel catalogo.</p>
+    </section>
 {% endif %}
 {% endblock %}

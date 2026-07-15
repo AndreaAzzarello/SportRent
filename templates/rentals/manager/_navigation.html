@@ -1,12 +1,10 @@
-{# Navigazione comune del pannello gestori. #}
-<nav aria-label="Navigazione area gestione">
-    <strong>Area gestione:</strong>
+<nav class="manager-nav" aria-label="Navigazione area gestione">
+    <span>Area gestione</span>
     <a href="{% url 'manager_dashboard' %}">Riepilogo</a>
-    | <a href="{% url 'manager_equipment_list' %}">Attrezzature</a>
-    | <a href="{% url 'manager_category_list' %}">Categorie</a>
-    | <a href="{% url 'manager_reservation_list' %}">Prenotazioni</a>
+    <a href="{% url 'manager_equipment_list' %}">Attrezzature</a>
+    <a href="{% url 'manager_category_list' %}">Categorie</a>
+    <a href="{% url 'manager_reservation_list' %}">Prenotazioni</a>
     {% if user.is_staff %}
-        | <a href="{% url 'admin:index' %}">Amministrazione avanzata</a>
+        <a href="{% url 'admin:index' %}">Amministrazione avanzata</a>
     {% endif %}
 </nav>
-<hr>

@@ -2,66 +2,62 @@
 <!doctype html>
 <html lang="it">
 <head>
-    {# Template base: struttura comune, menu, messaggi e footer del sito. #}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}SportRent{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'rentals/css/site.css' %}">
+    <script src="{% static 'rentals/js/site.js' %}" defer></script>
 </head>
 <body>
-    {# Layout comune e navigazione adattata al tipo di utente autenticato. #}
-    <header>
-        <h1><a href="{% url 'equipment_list' %}">SportRent</a></h1>
-        <p><strong>L'attrezzatura giusta per il tuo prossimo sport.</strong></p>
-        <nav aria-label="Navigazione principale">
-            <a href="{% url 'equipment_list' %}">Cerca e prenota</a>
-            {# Il menu mostra opzioni diverse dopo il login. #}
-            {% if user.is_authenticated %}
-                | <a href="{% url 'reservation_history' %}">I miei noleggi</a>
-                {% if user.is_staff or user.is_superuser %}
-                    | <a href="{% url 'manager_dashboard' %}">Area gestione</a>
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="brand" href="{% url 'equipment_list' %}">
+                <span class="brand__mark">SR</span>
+                <span><strong>SportRent</strong><small>Attrezzatura sportiva a noleggio</small></span>
+            </a>
+            <nav class="site-nav" aria-label="Navigazione principale">
+                <a href="{% url 'equipment_list' %}">Cerca e prenota</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'reservation_history' %}">I miei noleggi</a>
+                    {% if user.is_staff or user.is_superuser %}
+                        <a href="{% url 'manager_dashboard' %}">Area gestione</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}">Accedi</a>
+                    <a class="nav-cta" href="{% url 'register' %}">Crea account</a>
                 {% endif %}
-            {% else %}
-                | <a href="{% url 'login' %}">Accedi</a>
-                | <a href="{% url 'register' %}">Crea account</a>
-            {% endif %}
-        </nav>
+            </nav>
+        </div>
         {% if user.is_authenticated %}
-            <p>
-                Accesso effettuato come
-                <strong>{{ user.get_full_name|default:user.username }}</strong>
-                {% if user.is_staff or user.is_superuser %}(gestore){% else %}(cliente){% endif %}
-            </p>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit">Esci dall'account</button>
-            </form>
+            <div class="user-strip">
+                <p>
+                    Accesso effettuato come
+                    <strong>{{ user.get_full_name|default:user.username }}</strong>
+                    {% if user.is_staff or user.is_superuser %}<span class="badge">gestore</span>{% else %}<span class="badge">cliente</span>{% endif %}
+                </p>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="button button--ghost" type="submit">Esci</button>
+                </form>
+            </div>
         {% endif %}
-        <hr>
     </header>
 
     {% if messages %}
-        {# I messaggi Django confermano l'esito delle operazioni POST. #}
-        <section aria-label="Messaggi">
+        <section class="messages" aria-label="Messaggi">
             <h2>Comunicazioni</h2>
-            {% for message in messages %}
-                <p><strong>{{ message }}</strong></p>
-            {% endfor %}
-            <hr>
+            {% for message in messages %}<p><strong>{{ message }}</strong></p>{% endfor %}
         </section>
     {% endif %}
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <main class="site-main">{% block content %}{% endblock %}</main>
 
-    <footer>
-        <hr>
-        <p><strong>SportRent</strong> - Noleggio di attrezzature sportive.</p>
-        <p>
-            Scegli una categoria, indica il periodo e prenota online.
-            Il pagamento avviene al ritiro.
-        </p>
+    <footer class="site-footer">
+        <div>
+            <strong>SportRent</strong>
+            <p>Scegli una categoria, indica il periodo e prenota online. Il pagamento avviene al ritiro.</p>
+        </div>
+        <a href="{% url 'equipment_list' %}">Torna al catalogo</a>
     </footer>
 </body>
 </html>

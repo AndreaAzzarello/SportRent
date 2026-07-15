@@ -1,66 +1,70 @@
 {% extends "base.html" %}
-{# Pagina di registrazione pubblica: crea un nuovo account cliente. #}
 
 {% block title %}Registrazione - SportRent{% endblock %}
 
 {% block content %}
-<h2>Crea il tuo account SportRent</h2>
-<p>
-    Registrati per prenotare attrezzature e consultare lo storico dei
-    tuoi noleggi. Tutti i campi sono obbligatori.
-</p>
+<section class="auth-layout" aria-labelledby="register-title">
+    <div class="auth-intro">
+        <p class="eyebrow">Nuovo cliente</p>
+        <h1 id="register-title">Crea il tuo account SportRent</h1>
+        <p>
+            La registrazione serve per confermare le prenotazioni e ritrovare
+            in un unico punto noleggi futuri, in corso e conclusi.
+        </p>
+        <div class="auth-benefits">
+            <span>Account gratuito</span>
+            <span>Accesso automatico dopo la registrazione</span>
+            <span>Ritorno alla scheda prodotto se eri già in fase di prenotazione</span>
+        </div>
+    </div>
 
-<form method="post">
-    {% csrf_token %}
-    {% if next %}
-        <input type="hidden" name="next" value="{{ next }}">
-    {% endif %}
-    {{ form.non_field_errors }}
-    <fieldset>
-        <legend>Dati personali</legend>
-        <p>
-            {{ form.first_name.label_tag }}
-            {{ form.first_name }}
-            {{ form.first_name.errors }}
-        </p>
-        <p>
-            {{ form.last_name.label_tag }}
-            {{ form.last_name }}
-            {{ form.last_name.errors }}
-        </p>
-        <p>
-            {{ form.email.label_tag }}
-            {{ form.email }}
-            {{ form.email.errors }}
-        </p>
-    </fieldset>
-    <fieldset>
-        <legend>Credenziali di accesso</legend>
-        <p>
-            {{ form.username.label_tag }}
-            {{ form.username }}
-            {{ form.username.help_text }}
-            {{ form.username.errors }}
-        </p>
-        <p>
-            {{ form.password1.label_tag }}
-            {{ form.password1 }}
-            {{ form.password1.help_text }}
-            {{ form.password1.errors }}
-        </p>
-        <p>
-            {{ form.password2.label_tag }}
-            {{ form.password2 }}
-            {{ form.password2.help_text }}
-            {{ form.password2.errors }}
-        </p>
-    </fieldset>
-    <p>
-        Creando l'account verrai autenticato automaticamente e potrai
-        iniziare subito una prenotazione.
-    </p>
-    <button type="submit">Registrati</button>
-</form>
+    <form class="auth-card auth-card--wide" method="post">
+        {% csrf_token %}
+        {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+        {{ form.non_field_errors }}
 
-<p>Hai già un account? <a href="{% url 'login' %}">Accedi</a>.</p>
+        <p class="eyebrow">Dati account</p>
+        <h2>Registrazione cliente</h2>
+        <div class="form-grid form-grid--two">
+            <p>
+                {{ form.first_name.label_tag }}
+                {{ form.first_name }}
+                {{ form.first_name.errors }}
+            </p>
+            <p>
+                {{ form.last_name.label_tag }}
+                {{ form.last_name }}
+                {{ form.last_name.errors }}
+            </p>
+            <p>
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {{ form.email.errors }}
+            </p>
+            <p>
+                {{ form.username.label_tag }}
+                {{ form.username }}
+                {{ form.username.errors }}
+            </p>
+            <p>
+                {{ form.password1.label_tag }}
+                {{ form.password1 }}
+                {{ form.password1.errors }}
+            </p>
+            <p>
+                {{ form.password2.label_tag }}
+                {{ form.password2 }}
+                {{ form.password2.errors }}
+            </p>
+        </div>
+        <p class="form-note">
+            Creando l'account verrai autenticato automaticamente e potrai
+            iniziare subito una prenotazione.
+        </p>
+        <button class="button button--wide" type="submit">Registrati</button>
+        <p class="auth-switch">Hai già un account? <a href="{% url 'login' %}">Accedi</a>.</p>
+    </form>
+</section>
 {% endblock %}

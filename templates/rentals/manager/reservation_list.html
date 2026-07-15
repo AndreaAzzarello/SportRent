@@ -1,68 +1,82 @@
 {% extends "base.html" %}
-{# Elenco prenotazioni clienti con filtri per stato del noleggio. #}
 
 {% block title %}Gestione prenotazioni - SportRent{% endblock %}
 
 {% block content %}
-<h2>Prenotazioni clienti</h2>
-<p>
-    Controlla ritiri futuri, noleggi in corso, pratiche concluse e
-    cancellazioni.
-</p>
+<section class="page-hero page-hero--manager" aria-labelledby="manager-reservations-title">
+    <div>
+        <p class="eyebrow">Prenotazioni clienti</p>
+        <h1 id="manager-reservations-title">Prenotazioni clienti</h1>
+        <p>
+            Controlla ritiri futuri, noleggi in corso, pratiche concluse e
+            cancellazioni.
+        </p>
+    </div>
+    <a class="button button--light" href="{% url 'manager_dashboard' %}">Torna al riepilogo</a>
+</section>
+
 {% include "rentals/manager/_navigation.html" %}
 
-<nav aria-label="Filtri prenotazioni">
-    <strong>Mostra:</strong>
-    <a href="?filter=active">Attive</a>
-    | <a href="?filter=upcoming">In programma</a>
-    | <a href="?filter=in_progress">In corso</a>
-    | <a href="?filter=completed">Concluse</a>
-    | <a href="?filter=cancelled">Cancellate</a>
-    | <a href="?filter=all">Tutte</a>
-</nav>
+<section class="section-card">
+    <div class="toolbar">
+        <nav class="filter-pills" aria-label="Filtri prenotazioni">
+            <a class="{% if filtro_scelto == 'active' %}is-active{% endif %}" href="?filter=active">Attive</a>
+            <a class="{% if filtro_scelto == 'upcoming' %}is-active{% endif %}" href="?filter=upcoming">In programma</a>
+            <a class="{% if filtro_scelto == 'in_progress' %}is-active{% endif %}" href="?filter=in_progress">In corso</a>
+            <a class="{% if filtro_scelto == 'completed' %}is-active{% endif %}" href="?filter=completed">Concluse</a>
+            <a class="{% if filtro_scelto == 'cancelled' %}is-active{% endif %}" href="?filter=cancelled">Cancellate</a>
+            <a class="{% if filtro_scelto == 'all' %}is-active{% endif %}" href="?filter=all">Tutte</a>
+        </nav>
+        <label class="table-search">
+            Cerca prenotazione
+            <input type="search" data-table-search="manager-reservation-table" placeholder="Cliente, data, stato...">
+        </label>
+    </div>
 
-<table>
-    <thead>
-        <tr>
-            <th scope="col">Numero</th>
-            <th scope="col">Cliente</th>
-            <th scope="col">Periodo</th>
-            <th scope="col">Durata</th>
-            <th scope="col">Situazione</th>
-            <th scope="col">Totale</th>
-            <th scope="col">Creata</th>
-            <th scope="col">Azioni</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for reservation in reservations %}
-            <tr>
-                <td><strong>#{{ reservation.pk }}</strong></td>
-                <td>
-                    {{ reservation.user.get_full_name|default:reservation.user.username }}
-                    <br>{{ reservation.user.email|default:"Email non indicata" }}
-                </td>
-                <td>
-                    {{ reservation.start_date|date:"d/m/Y" }} -
-                    {{ reservation.end_date|date:"d/m/Y" }}
-                </td>
-                <td>{{ reservation.giorni_noleggio }} giorni</td>
-                <td><strong>{{ reservation.etichetta_fase_noleggio }}</strong></td>
-                <td>{{ reservation.prezzo_totale }} euro</td>
-                <td>{{ reservation.created_at|date:"d/m/Y H:i" }}</td>
-                <td>
-                    <a href="{% url 'reservation_detail' reservation.pk %}">
-                        Apri riepilogo
-                    </a>
-                </td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="8">
-                    Nessuna prenotazione corrisponde al filtro scelto.
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <div class="table-wrap">
+        <table class="manager-table" id="manager-reservation-table" data-searchable-table>
+            <thead>
+                <tr>
+                    <th scope="col">Numero</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Periodo</th>
+                    <th scope="col">Durata</th>
+                    <th scope="col">Situazione</th>
+                    <th scope="col">Totale</th>
+                    <th scope="col">Creata</th>
+                    <th scope="col">Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                    <tr>
+                        <td><strong>#{{ reservation.pk }}</strong></td>
+                        <td>
+                            <strong>{{ reservation.user.get_full_name|default:reservation.user.username }}</strong>
+                            <small>{{ reservation.user.email|default:"Email non indicata" }}</small>
+                        </td>
+                        <td>{{ reservation.start_date|date:"d/m/Y" }} - {{ reservation.end_date|date:"d/m/Y" }}</td>
+                        <td>{{ reservation.giorni_noleggio }} giorni</td>
+                        <td>
+                            <span class="status-badge status-badge--{{ reservation.fase_noleggio }}">
+                                {{ reservation.etichetta_fase_noleggio }}
+                            </span>
+                        </td>
+                        <td><strong>{{ reservation.prezzo_totale }} euro</strong></td>
+                        <td>{{ reservation.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <a class="button button--light" href="{% url 'reservation_detail' reservation.pk %}">
+                                Apri riepilogo
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8">Nessuna prenotazione corrisponde al filtro scelto.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
 {% endblock %}

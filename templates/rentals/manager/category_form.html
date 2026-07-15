@@ -1,33 +1,38 @@
 {% extends "base.html" %}
-{# Form gestore per creare o modificare una categoria sportiva. #}
 
 {% block title %}{{ page_title }} - SportRent{% endblock %}
 
 {% block content %}
-<h2>{{ page_title }}</h2>
-<p>
-    La categoria aiuta i clienti a trovare rapidamente l'attrezzatura.
-</p>
+<section class="page-hero page-hero--manager" aria-labelledby="category-form-title">
+    <div>
+        <p class="eyebrow">Categoria</p>
+        <h1 id="category-form-title">{{ page_title }}</h1>
+        <p>La categoria aiuta i clienti a trovare rapidamente l'attrezzatura.</p>
+    </div>
+    <a class="button button--light" href="{% url 'manager_category_list' %}">Torna alle categorie</a>
+</section>
+
 {% include "rentals/manager/_navigation.html" %}
 
-<form method="post">
+<form class="form-layout form-layout--single" method="post">
     {% csrf_token %}
-    {{ form.non_field_errors }}
-    <fieldset>
-        <legend>Dati categoria</legend>
-        <p>
-            {{ form.name.label_tag }}
-            {{ form.name }}
-            {{ form.name.errors }}
-        </p>
-        <p>
-            {{ form.description.label_tag }}
-            {{ form.description }}
-            {{ form.description.errors }}
-        </p>
-    </fieldset>
-    <button type="submit">Salva categoria</button>
+    <section class="form-card">
+        <p class="eyebrow">Dati categoria</p>
+        <h2>Informazioni visibili nel catalogo</h2>
+        {{ form.non_field_errors }}
+        <div class="form-stack">
+            <p>
+                {{ form.name.label_tag }}
+                {{ form.name }}
+                {{ form.name.errors }}
+            </p>
+            <p>
+                {{ form.description.label_tag }}
+                {{ form.description }}
+                {{ form.description.errors }}
+            </p>
+        </div>
+        <button class="button" type="submit">Salva categoria</button>
+    </section>
 </form>
-
-<p><a href="{% url 'manager_category_list' %}">Annulla e torna alle categorie</a></p>
 {% endblock %}

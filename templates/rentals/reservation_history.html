@@ -1,74 +1,102 @@
 {% extends "base.html" %}
-{# Storico cliente: filtra noleggi attivi, conclusi e cancellati. #}
 
 {% block title %}I miei noleggi - SportRent{% endblock %}
 
 {% block content %}
-<h2>I miei noleggi</h2>
-<p>
-    Controlla i noleggi ancora attivi, quelli conclusi e le prenotazioni
-    cancellate.
-</p>
-<p><a href="{% url 'equipment_list' %}">Cerca una nuova attrezzatura</a></p>
+<section class="page-hero" aria-labelledby="history-title">
+    <div>
+        <p class="eyebrow">Area cliente</p>
+        <h1 id="history-title">I miei noleggi</h1>
+        <p>
+            Controlla i noleggi ancora attivi, quelli conclusi e le
+            prenotazioni cancellate.
+        </p>
+    </div>
+    <a class="button" href="{% url 'equipment_list' %}">Cerca una nuova attrezzatura</a>
+</section>
 
-<nav aria-label="Filtri noleggi">
-    <strong>Mostra:</strong>
-    <a href="?filter=active">Attivi ({{ conteggi.active }})</a>
-    | <a href="?filter=upcoming">In programma ({{ conteggi.upcoming }})</a>
-    | <a href="?filter=in_progress">In corso ({{ conteggi.in_progress }})</a>
-    | <a href="?filter=completed">Conclusi ({{ conteggi.completed }})</a>
-    | <a href="?filter=cancelled">Cancellati ({{ conteggi.cancelled }})</a>
-    | <a href="?filter=all">Tutti ({{ conteggi.all }})</a>
-</nav>
-
-<hr>
+<section class="section-card">
+    <div class="section-heading section-heading--row">
+        <div>
+            <p class="eyebrow">Filtri</p>
+            <h2>Consulta lo storico</h2>
+        </div>
+    </div>
+    <nav class="filter-pills" aria-label="Filtri noleggi">
+        <a class="{% if filtro_scelto == 'active' %}is-active{% endif %}" href="?filter=active">Attivi <span>{{ conteggi.active }}</span></a>
+        <a class="{% if filtro_scelto == 'upcoming' %}is-active{% endif %}" href="?filter=upcoming">In programma <span>{{ conteggi.upcoming }}</span></a>
+        <a class="{% if filtro_scelto == 'in_progress' %}is-active{% endif %}" href="?filter=in_progress">In corso <span>{{ conteggi.in_progress }}</span></a>
+        <a class="{% if filtro_scelto == 'completed' %}is-active{% endif %}" href="?filter=completed">Conclusi <span>{{ conteggi.completed }}</span></a>
+        <a class="{% if filtro_scelto == 'cancelled' %}is-active{% endif %}" href="?filter=cancelled">Cancellati <span>{{ conteggi.cancelled }}</span></a>
+        <a class="{% if filtro_scelto == 'all' %}is-active{% endif %}" href="?filter=all">Tutti <span>{{ conteggi.all }}</span></a>
+    </nav>
+</section>
 
 {% if reservations %}
-    <table>
-        <thead>
-            <tr>
-                <th scope="col">Noleggio</th>
-                <th scope="col">Periodo</th>
-                <th scope="col">Durata</th>
-                <th scope="col">Situazione</th>
-                <th scope="col">Totale</th>
-                <th scope="col">Azione</th>
-            </tr>
-        </thead>
-        <tbody>
-            {# Il ciclo mostra una riga per ogni prenotazione del cliente collegato. #}
-            {% for reservation in reservations %}
-                <tr>
-                    <td>
-                        <strong>#{{ reservation.pk }}</strong><br>
-                        Creato il {{ reservation.created_at|date:"d/m/Y" }}
-                    </td>
-                    <td>
-                        {{ reservation.start_date|date:"d/m/Y" }} -
-                        {{ reservation.end_date|date:"d/m/Y" }}
-                    </td>
-                    <td>{{ reservation.giorni_noleggio }} giorni</td>
-                    <td><strong>{{ reservation.etichetta_fase_noleggio }}</strong></td>
-                    <td>{{ reservation.prezzo_totale }} euro</td>
-                    <td>
-                        <a href="{% url 'reservation_detail' reservation.pk %}">
-                            Apri il riepilogo
-                        </a>
-                        {% if reservation.puo_essere_cancellata %}
-                            <br>Ancora cancellabile
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <section class="section-card">
+        <div class="toolbar">
+            <div>
+                <p class="eyebrow">Risultati</p>
+                <h2>Noleggi trovati</h2>
+            </div>
+            <label class="table-search">
+                Cerca nello storico
+                <input type="search" data-table-search="customer-reservations" placeholder="Cliente, data, stato...">
+            </label>
+        </div>
+        <div class="table-wrap">
+            <table class="manager-table" id="customer-reservations" data-searchable-table>
+                <thead>
+                    <tr>
+                        <th scope="col">Noleggio</th>
+                        <th scope="col">Periodo</th>
+                        <th scope="col">Durata</th>
+                        <th scope="col">Situazione</th>
+                        <th scope="col">Totale</th>
+                        <th scope="col">Azione</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                        <tr>
+                            <td>
+                                <strong>#{{ reservation.pk }}</strong>
+                                <small>Creato il {{ reservation.created_at|date:"d/m/Y" }}</small>
+                            </td>
+                            <td>
+                                {{ reservation.start_date|date:"d/m/Y" }} -
+                                {{ reservation.end_date|date:"d/m/Y" }}
+                            </td>
+                            <td>{{ reservation.giorni_noleggio }} giorni</td>
+                            <td>
+                                <span class="status-badge status-badge--{{ reservation.fase_noleggio }}">
+                                    {{ reservation.etichetta_fase_noleggio }}
+                                </span>
+                            </td>
+                            <td><strong>{{ reservation.prezzo_totale }} euro</strong></td>
+                            <td>
+                                <a class="button button--light" href="{% url 'reservation_detail' reservation.pk %}">
+                                    Apri il riepilogo
+                                </a>
+                                {% if reservation.puo_essere_cancellata %}
+                                    <small class="table-note">Ancora cancellabile</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 {% else %}
-    <h3>Nessun noleggio in questa sezione</h3>
-    {% if filtro_scelto == "active" %}
-        <p>Non hai noleggi futuri o attualmente in corso.</p>
-        <p><a href="{% url 'equipment_list' %}">Cerca un'attrezzatura</a></p>
-    {% else %}
-        <p>Scegli un altro filtro per consultare lo storico completo.</p>
-    {% endif %}
+    <section class="section-card empty-state">
+        <h2>Nessun noleggio in questa sezione</h2>
+        {% if filtro_scelto == "active" %}
+            <p>Non hai noleggi futuri o attualmente in corso.</p>
+            <a class="button" href="{% url 'equipment_list' %}">Cerca un'attrezzatura</a>
+        {% else %}
+            <p>Scegli un altro filtro per consultare lo storico completo.</p>
+        {% endif %}
+    </section>
 {% endif %}
 {% endblock %}

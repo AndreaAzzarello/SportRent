@@ -1,118 +1,105 @@
 {% extends "base.html" %}
-{# Dashboard gestore: riepilogo operativo e ultime prenotazioni. #}
 
 {% block title %}Pannello gestori - SportRent{% endblock %}
 
 {% block content %}
-<h2>Pannello gestori</h2>
-<p>
-    Controlla il catalogo, la disponibilità e le prenotazioni del servizio.
-</p>
-{% include "rentals/manager/_navigation.html" %}
-
-<section aria-labelledby="manager-summary">
-    <h3 id="manager-summary">Riepilogo operativo</h3>
-    <table>
-        <thead>
-            <tr>
-                <th scope="col">Dato</th>
-                <th scope="col">Valore</th>
-                <th scope="col">Azione</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Attrezzature nel sistema</td>
-                <td><strong>{{ conteggio_attrezzature }}</strong></td>
-                <td>
-                    <a href="{% url 'manager_equipment_list' %}">
-                        Gestisci catalogo
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Attrezzature pubblicate</td>
-                <td><strong>{{ conteggio_attrezzature_attive }}</strong></td>
-                <td>
-                    <a href="{% url 'manager_equipment_create' %}">
-                        Aggiungi attrezzatura
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Prenotazioni confermate</td>
-                <td><strong>{{ prenotazioni_confermate }}</strong></td>
-                <td>
-                    <a href="{% url 'manager_reservation_list' %}?filter=active">
-                        Mostra attive
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Noleggi in corso</td>
-                <td><strong>{{ prenotazioni_in_corso }}</strong></td>
-                <td>
-                    <a href="{% url 'manager_reservation_list' %}?filter=in_progress">
-                        Mostra in corso
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Ritiri futuri</td>
-                <td><strong>{{ prenotazioni_future }}</strong></td>
-                <td>
-                    <a href="{% url 'manager_reservation_list' %}?filter=upcoming">
-                        Mostra futuri
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Clienti con prenotazioni</td>
-                <td><strong>{{ conteggio_clienti }}</strong></td>
-                <td>Dato informativo</td>
-            </tr>
-        </tbody>
-    </table>
+<section class="page-hero page-hero--manager" aria-labelledby="manager-title">
+    <div>
+        <p class="eyebrow">Area gestione</p>
+        <h1 id="manager-title">Pannello gestori</h1>
+        <p>
+            Controlla catalogo, disponibilità e prenotazioni del servizio da
+            una schermata unica.
+        </p>
+    </div>
+    <a class="button" href="{% url 'manager_equipment_create' %}">Aggiungi attrezzatura</a>
 </section>
 
-<section aria-labelledby="recent-reservations">
-    <h3 id="recent-reservations">Ultime prenotazioni</h3>
+{% include "rentals/manager/_navigation.html" %}
+
+<section class="section-card" aria-labelledby="manager-summary">
+    <div class="section-heading">
+        <p class="eyebrow">Riepilogo operativo</p>
+        <h2 id="manager-summary">Riepilogo operativo</h2>
+    </div>
+    <div class="metric-grid">
+        <a class="metric-card" href="{% url 'manager_equipment_list' %}">
+            <span>Attrezzature nel sistema</span>
+            <strong>{{ conteggio_attrezzature }}</strong>
+            <small>Gestisci catalogo</small>
+        </a>
+        <a class="metric-card" href="{% url 'manager_equipment_create' %}">
+            <span>Attrezzature pubblicate</span>
+            <strong>{{ conteggio_attrezzature_attive }}</strong>
+            <small>Aggiungi o modifica articoli</small>
+        </a>
+        <a class="metric-card" href="{% url 'manager_reservation_list' %}?filter=active">
+            <span>Prenotazioni confermate</span>
+            <strong>{{ prenotazioni_confermate }}</strong>
+            <small>Mostra attive</small>
+        </a>
+        <a class="metric-card" href="{% url 'manager_reservation_list' %}?filter=in_progress">
+            <span>Noleggi in corso</span>
+            <strong>{{ prenotazioni_in_corso }}</strong>
+            <small>Da monitorare oggi</small>
+        </a>
+        <a class="metric-card" href="{% url 'manager_reservation_list' %}?filter=upcoming">
+            <span>Ritiri futuri</span>
+            <strong>{{ prenotazioni_future }}</strong>
+            <small>Prossime consegne</small>
+        </a>
+        <div class="metric-card metric-card--static">
+            <span>Clienti con prenotazioni</span>
+            <strong>{{ conteggio_clienti }}</strong>
+            <small>Dato informativo</small>
+        </div>
+    </div>
+</section>
+
+<section class="section-card" aria-labelledby="recent-reservations">
+    <div class="toolbar">
+        <div>
+            <p class="eyebrow">Prenotazioni</p>
+            <h2 id="recent-reservations">Ultime prenotazioni</h2>
+        </div>
+        <a class="button button--light" href="{% url 'manager_reservation_list' %}">Vedi tutte</a>
+    </div>
     {% if prenotazioni_recenti %}
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col">Numero</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Periodo</th>
-                    <th scope="col">Stato</th>
-                    <th scope="col">Totale</th>
-                    <th scope="col">Azione</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for reservation in prenotazioni_recenti %}
+        <div class="table-wrap">
+            <table class="manager-table">
+                <thead>
                     <tr>
-                        <td>#{{ reservation.pk }}</td>
-                        <td>
-                            {{ reservation.user.get_full_name|default:reservation.user.username }}
-                        </td>
-                        <td>
-                            {{ reservation.start_date|date:"d/m/Y" }} -
-                            {{ reservation.end_date|date:"d/m/Y" }}
-                        </td>
-                        <td>{{ reservation.etichetta_fase_noleggio }}</td>
-                        <td>{{ reservation.prezzo_totale }} euro</td>
-                        <td>
-                            <a href="{% url 'reservation_detail' reservation.pk %}">
-                                Apri
-                            </a>
-                        </td>
+                        <th scope="col">Numero</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Periodo</th>
+                        <th scope="col">Stato</th>
+                        <th scope="col">Totale</th>
+                        <th scope="col">Azione</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for reservation in prenotazioni_recenti %}
+                        <tr>
+                            <td><strong>#{{ reservation.pk }}</strong></td>
+                            <td>{{ reservation.user.get_full_name|default:reservation.user.username }}</td>
+                            <td>{{ reservation.start_date|date:"d/m/Y" }} - {{ reservation.end_date|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="status-badge status-badge--{{ reservation.fase_noleggio }}">
+                                    {{ reservation.etichetta_fase_noleggio }}
+                                </span>
+                            </td>
+                            <td><strong>{{ reservation.prezzo_totale }} euro</strong></td>
+                            <td><a class="button button--light" href="{% url 'reservation_detail' reservation.pk %}">Apri</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        <p>Non sono presenti prenotazioni.</p>
+        <div class="empty-state">
+            <h3>Non sono presenti prenotazioni.</h3>
+            <p>Quando un cliente prenoterà un'attrezzatura, la vedrai qui.</p>
+        </div>
     {% endif %}
 </section>
 {% endblock %}

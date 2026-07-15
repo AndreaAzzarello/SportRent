@@ -1,90 +1,53 @@
 {% extends "base.html" %}
-{# Scheda pubblica di un'attrezzatura con disponibilità e avvio prenotazione. #}
 
 {% block title %}{{ equipment.name }} - SportRent{% endblock %}
 
 {% block content %}
-<article>
-    <p>
-        <a href="{% url 'equipment_list' %}?category={{ equipment.category.pk }}{% if periodo_scelto %}&amp;start_date={{ periodo_scelto.start_date|date:'Y-m-d' }}&amp;end_date={{ periodo_scelto.end_date|date:'Y-m-d' }}{% endif %}">
-            Torna alla categoria {{ equipment.category.name }}
-        </a>
-    </p>
-    <h2>{{ equipment.name }}</h2>
-    <p><strong>{{ equipment.category.name }}</strong></p>
-
-    {% if equipment.image %}
-        <img
-            src="{{ equipment.image.url }}"
-            alt="{{ equipment.name }}"
-            width="500"
-        >
-    {% else %}
-        <p><em>Immagine non ancora disponibile.</em></p>
-    {% endif %}
-
-    <h3>Descrizione</h3>
-    <p>{{ equipment.description|linebreaksbr }}</p>
-
-    <h3>Informazioni sul noleggio</h3>
-    <dl>
-        <dt>Prezzo giornaliero</dt>
-        <dd><strong>{{ equipment.daily_price }} euro</strong></dd>
-        {% if periodo_scelto %}
-            <dt>Periodo richiesto</dt>
-            <dd>
-                {{ periodo_scelto.start_date|date:"d/m/Y" }} -
-                {{ periodo_scelto.end_date|date:"d/m/Y" }}
-            </dd>
-            <dt>Disponibili nel periodo</dt>
-            <dd><strong>{{ disponibili_periodo }} unità</strong></dd>
+<p><a class="link-muted" href="{% url 'equipment_list' %}?category={{ equipment.category.pk }}{% if periodo_scelto %}&amp;start_date={{ periodo_scelto.start_date|date:'Y-m-d' }}&amp;end_date={{ periodo_scelto.end_date|date:'Y-m-d' }}{% endif %}">Torna alla categoria {{ equipment.category.name }}</a></p>
+<article class="detail-layout">
+    <div class="detail-media">
+        {% if equipment.image %}
+            <img class="detail-image product-image" src="{{ equipment.image.url }}" alt="{{ equipment.name }}">
         {% else %}
-            <dt>Disponibili oggi</dt>
-            <dd>{{ available_today }} su {{ equipment.total_quantity }} unità</dd>
+            <div class="image-placeholder image-placeholder--large">Immagine non ancora disponibile.</div>
         {% endif %}
-        <dt>Pagamento</dt>
-        <dd>Al ritiro dell'attrezzatura</dd>
-    </dl>
-
-    {% if not periodo_scelto %}
-        <p>
-            Per prenotare questa attrezzatura scegli prima il periodo di
-            noleggio della categoria.
-        </p>
-        <p>
-            <a href="{% url 'equipment_list' %}?category={{ equipment.category.pk }}">
-                Scegli le date per {{ equipment.category.name }}
-            </a>
-        </p>
-    {% elif disponibili_periodo == 0 %}
-        <p>
-            <strong>Articolo non disponibile nel periodo selezionato.</strong>
-        </p>
-        <p>
-            <a href="{% url 'equipment_list' %}?category={{ equipment.category.pk }}">
-                Cerca altre date
-            </a>
-        </p>
-    {% elif user.is_authenticated %}
-        <p>
-            <a href="{% url 'reservation_create' %}?equipment={{ equipment.pk }}&amp;category={{ equipment.category.pk }}&amp;start_date={{ periodo_scelto.start_date|date:'Y-m-d' }}&amp;end_date={{ periodo_scelto.end_date|date:'Y-m-d' }}">
-                Continua con la prenotazione
-            </a>
-        </p>
-    {% else %}
-        <h3>Accedi per prenotare</h3>
-        <p>
-            <a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">
-                Accedi al tuo account
-            </a>.
-        </p>
-        <p>
-            <a href="{% url 'register' %}?next={{ request.get_full_path|urlencode }}">
-                Crea un account gratuito
-            </a>
-            per effettuare la tua prima prenotazione.
-        </p>
-        <p>Dopo l'accesso tornerai a questa attrezzatura.</p>
-    {% endif %}
+    </div>
+    <div class="detail-content">
+        <p class="eyebrow">{{ equipment.category.name }}</p>
+        <h1>{{ equipment.name }}</h1>
+        <p class="lead">{{ equipment.description|linebreaksbr }}</p>
+        <div class="info-grid">
+            <div><span>Prezzo giornaliero</span><strong>{{ equipment.daily_price }} €</strong></div>
+            {% if periodo_scelto %}
+                <div><span>Periodo richiesto</span><strong>{{ periodo_scelto.start_date|date:"d/m/Y" }} - {{ periodo_scelto.end_date|date:"d/m/Y" }}</strong></div>
+                <div><span>Disponibili nel periodo</span><strong>{{ disponibili_periodo }} unità</strong></div>
+            {% else %}
+                <div><span>Disponibili oggi</span><strong>{{ available_today }} su {{ equipment.total_quantity }} unità</strong></div>
+            {% endif %}
+            <div><span>Pagamento</span><strong>Al ritiro</strong></div>
+        </div>
+        <div class="cta-panel">
+            {% if not periodo_scelto %}
+                <h3>Scegli prima il periodo</h3>
+                <p>Per prenotare questa attrezzatura seleziona le date nel catalogo della categoria.</p>
+                <a class="button" href="{% url 'equipment_list' %}?category={{ equipment.category.pk }}">Scegli le date per {{ equipment.category.name }}</a>
+            {% elif disponibili_periodo == 0 %}
+                <h3>Articolo non disponibile nel periodo selezionato.</h3>
+                <a class="button" href="{% url 'equipment_list' %}?category={{ equipment.category.pk }}">Cerca altre date</a>
+            {% elif user.is_authenticated %}
+                <h3>Pronto per il noleggio</h3>
+                <p>Le date sono già state selezionate. Puoi confermare questo articolo o aggiungerne altri della stessa categoria.</p>
+                <a class="button button--wide" href="{% url 'reservation_create' %}?equipment={{ equipment.pk }}&amp;category={{ equipment.category.pk }}&amp;start_date={{ periodo_scelto.start_date|date:'Y-m-d' }}&amp;end_date={{ periodo_scelto.end_date|date:'Y-m-d' }}">Continua con la prenotazione</a>
+            {% else %}
+                <h3>Accedi per prenotare</h3>
+                <p>Per completare il noleggio devi accedere o creare un account gratuito.</p>
+                <div class="hero__actions">
+                    <a class="button" href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">Accedi al tuo account</a>
+                    <a class="button button--light" href="{% url 'register' %}?next={{ request.get_full_path|urlencode }}">Crea un account gratuito</a>
+                </div>
+                <p><small>Dopo l'accesso tornerai a questa attrezzatura.</small></p>
+            {% endif %}
+        </div>
+    </div>
 </article>
 {% endblock %}
